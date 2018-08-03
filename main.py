@@ -69,4 +69,10 @@ app.router.add_get('/greet/{name}', handler.handle_greeting)
 
 app.router.add_view('/cbv', ClassBasedView)
 
+for resource in app.router.resources():
+    print(resource)
+
+for name, resource in app.router.named_resources().items():
+    print(name, resource)
+
 web.run_app(app)
