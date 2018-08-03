@@ -42,6 +42,13 @@ class Handler:
 
 handler = Handler()
 
+class ClassBasedView(web.View):
+    async def get(self):
+        return web.Response(text='HTTP GET: class based view')
+
+    async def post(self):
+        return web.Response(text='HTTP POST: class based view')
+
 app = web.Application()
 
 app.router.add_get('/', hello)
@@ -59,5 +66,7 @@ variable_resource.add_route('GET', variable_resource_handler)
 
 app.router.add_get('/intro', handler.handle_intro)
 app.router.add_get('/greet/{name}', handler.handle_greeting)
+
+app.router.add_view('/cbv', ClassBasedView)
 
 web.run_app(app)
