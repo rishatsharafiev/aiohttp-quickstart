@@ -1,0 +1,25 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Environments
+.env
+env/
+
+# IDE
+.idea/
+.cache
+.cache/*
+local_settings.py
+
+playground/*
+
+.cache
+.cache/*
+.coverage
+coverage.svg
+.pytest_cache
+.pytest_cache/*
