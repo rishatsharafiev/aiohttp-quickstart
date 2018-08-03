@@ -27,6 +27,21 @@ async def variable_resource_handler(request):
     url_for = request.app.router.get('variable_resource').url_for(name='john_doe').with_query({'a': 'b'})
     return web.Response(text=f"Hello, {name}. Your url is {url_for}")
 
+class Handler:
+
+    def __init__(self):
+        pass
+
+    def handle_intro(self, request):
+        return web.Response(text="Hello, world")
+
+    async def handle_greeting(self, request):
+        name = request.match_info.get('name', "Anonymous")
+        txt = "Hello, {}".format(name)
+        return web.Response(text=txt)
+
+handler = Handler()
+
 app = web.Application()
 
 app.router.add_get('/', hello)
@@ -41,5 +56,8 @@ resource.add_route('GET', get_resource_handler)
 
 variable_resource = app.router.add_resource('/variable_resource/{name:\d+}', name='variable_resource')
 variable_resource.add_route('GET', variable_resource_handler)
+
+app.router.add_get('/intro', handler.handle_intro)
+app.router.add_get('/greet/{name}', handler.handle_greeting)
 
 web.run_app(app)
