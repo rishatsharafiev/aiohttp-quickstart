@@ -75,4 +75,31 @@ for resource in app.router.resources():
 for name, resource in app.router.named_resources().items():
     print(name, resource)
 
+app.router.add_routes([
+    web.get('/get_alt', get_handler),
+    web.post('/post_alt', post_handler),
+])
+
+routes = web.RouteTableDef()
+
+@routes.get('/handle_get')
+async def handle_get(request):
+    return web.Response(text="handle_get")
+
+
+@routes.post('/handle_post')
+async def handle_post(request):
+    return web.Response(text="handle_post")
+
+@routes.view("/handle_view")
+class HandleView(web.View):
+
+    async def get(self):
+        return web.Response(text="handle_view_get")
+
+    async def post(self):
+        return web.Response(text="handle_view_post")
+
+app.router.add_routes(routes)
+
 web.run_app(app)
