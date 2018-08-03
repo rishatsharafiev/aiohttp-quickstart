@@ -24,7 +24,8 @@ async def get_resource_handler(request):
 
 async def variable_resource_handler(request):
     name = request.match_info['name']
-    return web.Response(text=f"Hello, {name}")
+    url_for = request.app.router.get('variable_resource').url_for(name='john_doe').with_query({'a': 'b'})
+    return web.Response(text=f"Hello, {name}. Your url is {url_for}")
 
 app = web.Application()
 
@@ -38,7 +39,7 @@ app.router.add_get('/get_without_head', get_without_head_handler, allow_head=Fal
 resource = app.router.add_resource('/resource', name='resource')
 resource.add_route('GET', get_resource_handler)
 
-variable_resource = app.router.add_resource('/variable_resource/{name:\d+}')
+variable_resource = app.router.add_resource('/variable_resource/{name:\d+}', name='variable_resource')
 variable_resource.add_route('GET', variable_resource_handler)
 
 web.run_app(app)
