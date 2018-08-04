@@ -1,6 +1,7 @@
 from aiohttp import web
 import aiohttp_jinja2
 import jinja2
+import os
 
 async def hello(request):
     return web.Response(text="Hello, world")
@@ -68,6 +69,38 @@ async def post_login(request):
         'password': password
     })
 
+@aiohttp_jinja2.template('mp3_uploader.html')
+async def get_mp3_handler(request):
+    return {}
+
+async def post_mp3_handler(request):
+
+    reader = await request.multipart()
+
+    # /!\ Don't forget to validate your inputs /!\
+
+    # reader.next() will `yield` the fields of your form
+
+    field = await reader.next()
+
+    assert field.name == 'mp3'
+    filename = field.filename
+    # You cannot rely on Content-Length if transfer is chunked.
+    size = 0
+
+    BASE_DIR = os.path.dirname(__file__)
+    MEDIA_PATH = 'media'
+    with open(os.path.join(BASE_DIR, MEDIA_PATH, filename), 'wb') as f:
+        while True:
+            chunk = await field.read_chunk()  # 8192 bytes by default.
+            if not chunk:
+                break
+            size += len(chunk)
+            f.write(chunk)
+
+    return web.Response(text='{} sized of {} successfully stored'
+                             ''.format(filename, size))
+
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 
@@ -126,5 +159,9 @@ app.router.add_get('/json_handler', json_handler)
 login_resource = app.router.add_resource('/login', name='login')
 login_resource.add_route('GET', get_login)
 login_resource.add_route('POST', post_login)
+
+mp3_uploader_resource = app.router.add_resource('/mp3_uploader', name='mp3_uploader')
+mp3_uploader_resource.add_route('GET', get_mp3_handler)
+mp3_uploader_resource.add_route('POST', post_mp3_handler)
 
 web.run_app(app)
