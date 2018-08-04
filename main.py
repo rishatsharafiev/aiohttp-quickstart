@@ -1,4 +1,6 @@
 from aiohttp import web
+import aiohttp_jinja2
+import jinja2
 
 async def hello(request):
     return web.Response(text="Hello, world")
@@ -53,7 +55,21 @@ async def json_handler(request):
     data = {'some': 'data'}
     return web.json_response(data)
 
+@aiohttp_jinja2.template('login.html')
+async def get_login(request):
+    return {}
+
+async def post_login(request):
+    data = await request.post()
+    login = data['login']
+    password = data['password']
+    return web.json_response({
+        'login': login,
+        'password': password
+    })
+
 app = web.Application()
+aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 
 app.router.add_get('/', hello)
 app.router.add_get('/get', get_handler)
@@ -106,5 +122,9 @@ class HandleView(web.View):
 
 app.router.add_routes(routes)
 app.router.add_get('/json_handler', json_handler)
+
+login_resource = app.router.add_resource('/login', name='login')
+login_resource.add_route('GET', get_login)
+login_resource.add_route('POST', post_login)
 
 web.run_app(app)
