@@ -49,6 +49,10 @@ class ClassBasedView(web.View):
     async def post(self):
         return web.Response(text='HTTP POST: class based view')
 
+async def json_handler(request):
+    data = {'some': 'data'}
+    return web.json_response(data)
+
 app = web.Application()
 
 app.router.add_get('/', hello)
@@ -101,5 +105,6 @@ class HandleView(web.View):
         return web.Response(text="handle_view_post")
 
 app.router.add_routes(routes)
+app.router.add_get('/json_handler', json_handler)
 
 web.run_app(app)
