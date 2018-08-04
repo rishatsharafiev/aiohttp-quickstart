@@ -12,6 +12,8 @@ name = "pypi"
 [packages]
 
 aiohttp = "*"
+cryptography = "*"
+aiohttp-session = "*"
 
 
 [requires]
