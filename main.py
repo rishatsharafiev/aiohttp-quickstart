@@ -101,6 +101,25 @@ async def post_mp3_handler(request):
     return web.Response(text='{} sized of {} successfully stored'
                              ''.format(filename, size))
 
+async def websocket_handler(request):
+
+    ws = web.WebSocketResponse()
+    await ws.prepare(request)
+
+    async for msg in ws:
+        if msg.type == aiohttp.WSMsgType.TEXT:
+            if msg.data == 'close':
+                await ws.close()
+            else:
+                await ws.send_str(msg.data + '/answer')
+        elif msg.type == aiohttp.WSMsgType.ERROR:
+            print('ws connection closed with exception %s' %
+                  ws.exception())
+
+    print('websocket connection closed')
+
+    return ws
+
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 
@@ -163,5 +182,7 @@ login_resource.add_route('POST', post_login)
 mp3_uploader_resource = app.router.add_resource('/mp3_uploader', name='mp3_uploader')
 mp3_uploader_resource.add_route('GET', get_mp3_handler)
 mp3_uploader_resource.add_route('POST', post_mp3_handler)
+
+app.router.add_get('/ws', websocket_handler)
 
 web.run_app(app)
