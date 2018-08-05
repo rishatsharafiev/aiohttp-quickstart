@@ -146,6 +146,14 @@ async def new_login(request):
 
     return {}
 
+
+async def open_redirect(request):
+    redirect = request.app.router.get('redirect').url_for()
+    raise web.HTTPFound(redirect)
+
+async def redirect(request):
+    return web.Response(text='Redirected')
+
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 
@@ -215,6 +223,7 @@ app.router.add_get('/auth', auth_handler)
 
 app.router.add_get('/new_login', new_login, name='new_login')
 app.router.add_post('/new_login', new_login, name='new_login')
-
+app.router.add_get('/open_redirect', open_redirect, name='open_redirect')
+app.router.add_get('/redirect', redirect, name='redirect')
 
 web.run_app(app)
