@@ -120,6 +120,32 @@ async def websocket_handler(request):
 
     return ws
 
+async def auth_handler(request):
+    location = request.app.router.get('login').url_for()
+    raise web.HTTPFound(location=location)
+
+def validate_login(form):
+    for name, value in form.items():
+        if value:
+            print(f'Validation not passed for {name} => {value}')
+            return True
+    return False
+
+@aiohttp_jinja2.template('new_login.html')
+async def new_login(request):
+
+    if request.method == 'POST':
+        form = await request.post()
+        error = validate_login(form)
+        if error:
+            return {'error': error}
+        else:
+            # login form is valid
+            location = request.app.router['new_login'].url_for()
+            raise web.HTTPFound(location=location)
+
+    return {}
+
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 
@@ -184,5 +210,11 @@ mp3_uploader_resource.add_route('GET', get_mp3_handler)
 mp3_uploader_resource.add_route('POST', post_mp3_handler)
 
 app.router.add_get('/ws', websocket_handler)
+
+app.router.add_get('/auth', auth_handler)
+
+app.router.add_get('/new_login', new_login, name='new_login')
+app.router.add_post('/new_login', new_login, name='new_login')
+
 
 web.run_app(app)
