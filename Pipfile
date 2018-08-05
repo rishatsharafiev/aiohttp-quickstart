@@ -11,6 +11,11 @@ name = "pypi"
 
 [packages]
 
+aiohttp = "*"
+cryptography = "*"
+aiohttp-session = "*"
+"jinja2" = "*"
+"aiohttp-jinja2" = "*"
 
 
 [requires]

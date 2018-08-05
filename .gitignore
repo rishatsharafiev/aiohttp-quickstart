@@ -23,3 +23,5 @@ playground/*
 coverage.svg
 .pytest_cache
 .pytest_cache/*
+
+*.mp3
